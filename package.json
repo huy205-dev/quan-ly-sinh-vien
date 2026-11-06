@@ -1,0 +1,20 @@
+{
+  "name": "quan-ly-sinh-vien",
+  "version": "1.0.0",
+  "description": "Mini project Quản lý sinh viên: CRUD đầy đủ + phân quyền người dùng (RBAC, REST API) + nhật ký truy cập Nginx",
+  "main": "server.js",
+  "type": "commonjs",
+  "private": true,
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test tests/"
+  },
+  "dependencies": {
+    "exceljs": "4.4.0",
+    "express": "5.3.0",
+    "fast-xml-parser": "5.12.0",
+    "multer": "2.5.0"
+  }
+}

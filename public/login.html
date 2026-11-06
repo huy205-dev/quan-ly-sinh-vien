@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Đăng nhập hệ thống Quản lý sinh viên.">
+  <title>Đăng nhập · Quản lý sinh viên</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/login.js"></script>
+</head>
+<body class="login-body">
+  <main class="login-page">
+    <aside class="login-hero" aria-labelledby="hero-title">
+      <div class="login-hero__inner">
+        <span class="brand__logo brand__logo--lg" aria-hidden="true">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/><path d="M22 10v6"/></svg>
+        </span>
+        <h2 id="hero-title">Hệ thống quản lý sinh viên</h2>
+        <p>Quản lý hồ sơ sinh viên và phân quyền người dùng trên cùng một giao diện gọn gàng.</p>
+        <ul class="login-hero__list">
+          <li><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span>Thêm, sửa, xóa, sao chép và tìm kiếm sinh viên</span></li>
+          <li><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span>Nhập / xuất dữ liệu Excel (.xlsx), JSON, XML</span></li>
+          <li><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span>Phân quyền theo vai trò: Xem / Thêm / Sửa / Xóa / Nhập / Xuất</span></li>
+          <li><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><span>Phím tắt <kbd>Alt</kbd> + phím cho mọi thao tác</span></li>
+        </ul>
+      </div>
+    </aside>
+
+    <section class="login-panel">
+      <div class="login-card">
+        <div class="login-card__brand">
+          <span class="brand__logo" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/><path d="M22 10v6"/></svg>
+          </span>
+          <div>
+            <h1>Đăng nhập</h1>
+            <p class="muted">Quản lý sinh viên</p>
+          </div>
+        </div>
+
+        <div id="login-alert" class="alert" role="alert" hidden></div>
+
+        <form id="login-form" class="form" novalidate>
+          <div class="field">
+            <label class="field__label" for="username">Tên đăng nhập</label>
+            <input class="input input--lg" id="username" name="username" type="text" autocomplete="username" autocapitalize="none"
+              spellcheck="false" maxlength="30" required aria-describedby="username-error" autofocus>
+            <p class="field__error" id="username-error" hidden></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="password">Mật khẩu</label>
+            <div class="input-group">
+              <input class="input input--lg" id="password" name="password" type="password" autocomplete="current-password" maxlength="100"
+                required aria-describedby="password-caps password-error">
+              <button type="button" class="btn-icon input-group__btn" id="toggle-password" aria-label="Hiện mật khẩu" aria-pressed="false">
+                <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <p class="field__hint field__hint--warning" id="password-caps" hidden>Caps Lock đang bật.</p>
+            <p class="field__error" id="password-error" hidden></p>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">Đăng nhập</button>
+        </form>
+
+        <section class="demo-accounts" aria-labelledby="demo-title">
+          <h2 class="demo-accounts__title" id="demo-title">Tài khoản dùng thử</h2>
+          <p class="muted small">Nhấp vào một tài khoản để điền sẵn tên đăng nhập và mật khẩu.</p>
+          <ul class="demo-accounts__list">
+            <li><button type="button" class="demo-account" data-demo-username="admin" data-demo-password="Admin@123">
+              <span class="demo-account__user">admin</span><span class="demo-account__role">Quản trị viên</span><code>Admin@123</code></button></li>
+            <li><button type="button" class="demo-account" data-demo-username="giaovu" data-demo-password="Giaovu@123">
+              <span class="demo-account__user">giaovu</span><span class="demo-account__role">Giáo vụ</span><code>Giaovu@123</code></button></li>
+            <li><button type="button" class="demo-account" data-demo-username="giangvien" data-demo-password="Giangvien@123">
+              <span class="demo-account__user">giangvien</span><span class="demo-account__role">Giảng viên</span><code>Giangvien@123</code></button></li>
+            <li><button type="button" class="demo-account" data-demo-username="viewer" data-demo-password="Viewer@123">
+              <span class="demo-account__user">viewer</span><span class="demo-account__role">Người xem</span><code>Viewer@123</code></button></li>
+          </ul>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

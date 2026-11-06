@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Quản lý sinh viên: danh sách, thêm, sửa, xóa, sao chép, nhập/xuất Excel, JSON, XML và phân quyền người dùng.">
+  <title>Quản lý sinh viên</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/main.js"></script>
+</head>
+<body class="is-booting">
+  <a class="skip-link" href="#main" data-skip-link>Bỏ qua tới nội dung chính</a>
+  <div class="progress-bar" aria-hidden="true"></div>
+
+  <header class="app-header">
+    <div class="app-header__inner">
+      <a class="brand" href="#/" aria-label="Quản lý sinh viên – trang chủ">
+        <span class="brand__logo" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M22 10 12 5 2 10l10 5 10-5Z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/><path d="M22 10v6"/></svg>
+        </span>
+        <span class="brand__text">Quản lý sinh viên</span>
+      </a>
+      <nav class="main-nav" id="main-nav" aria-label="Chức năng chính"></nav>
+      <div class="user-box" id="user-box"></div>
+    </div>
+  </header>
+
+  <main class="app-main" id="main" tabindex="-1">
+    <div class="view" id="view">
+      <div class="boot-loading"><span class="spinner" aria-hidden="true"></span><span>Đang tải…</span></div>
+    </div>
+  </main>
+
+  <div id="toast-region" class="toast-region"></div>
+  <noscript><p class="noscript">Ứng dụng cần bật JavaScript để hoạt động.</p></noscript>
+</body>
+</html>
