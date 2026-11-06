@@ -163,7 +163,15 @@ BEGIN {
   ipprefix = (substr(fip, length(fip), 1) == ".")
   nst = split(fstatus, stlist, ",")
   total = 0; matched = 0; bad = 0; shown = 0; ndays = 0; qlsv = 0
+  nm = split("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec", mname, " ")
+  for (i = 1; i <= nm; i++) monnum[mname[i]] = sprintf("%02d", i)
 }
+
+# Khóa so sánh được theo thời gian: "06/Nov/2026" -> "20261106"
+# (cần vì có thể truyền nhiều file theo thứ tự mới nhất trước, như access.log access.log.1 ...)
+function dkey(d) { return substr(d, 8, 4) monnum[substr(d, 4, 3)] substr(d, 1, 2) }
+# "06/Nov/2026:14:24:04" -> "20261106 14:24:04"
+function tkey(t) { return dkey(substr(t, 1, 11)) " " substr(t, 13, 8) }
 
 function status_ok(st,   i, s) {
   if (nst == 0) return 1
@@ -236,8 +244,10 @@ function top(cnt, n, label, extra, sum,   k, keys, nk, i, j, best, used, pct) {
   if (ENVIRON["LR_USER"] != "" && user != fuser) next
 
   matched++
-  if (matched == 1) first = t
-  last = t
+  # Lấy mốc sớm nhất / muộn nhất theo thời gian, không theo thứ tự dòng đọc vào
+  tk = tkey(t)
+  if (matched == 1 || tk < kfirst) { kfirst = tk; first = t }
+  if (matched == 1 || tk > klast) { klast = tk; last = t }
   shortpath = path; q = index(shortpath, "?"); if (q > 0) shortpath = substr(shortpath, 1, q - 1)
   shown_path = path; if (length(shown_path) > 70) shown_path = substr(shown_path, 1, 67) "..."
 
@@ -292,6 +302,12 @@ END {
 
   if (ndays > 1) {
     print "\n=== Số request theo ngày ==="
+    # sắp xếp ngày tăng dần (insertion sort, chạy được trên mọi bản awk)
+    for (i = 2; i <= ndays; i++) {
+      v = daylist[i]; j = i - 1
+      while (j >= 1 && dkey(daylist[j]) > dkey(v)) { daylist[j + 1] = daylist[j]; j-- }
+      daylist[j + 1] = v
+    }
     for (i = 1; i <= ndays; i++) printf "  %s  %6d\n", daylist[i], c_day[daylist[i]]
   }
 

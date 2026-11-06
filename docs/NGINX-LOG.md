@@ -169,7 +169,8 @@ error_log  /var/log/nginx/error.log notice;
     error_log  /var/log/nginx/error.log warn;
 ```
 
-Đọc kết quả: dòng 1–2 đến từ `/etc/nginx/nginx.conf` của image (mức `http`), dòng 3 là chú
+Đọc kết quả: dòng 1–2 đến từ `/etc/nginx/nginx.conf` của image. Dòng 1 (`error_log … notice`)
+nằm ở mức main (ngoài cùng, trước khối `events {}`), dòng 2 (`access_log … main`) ở mức `http`. Dòng 3 là chú
 thích trong `qlsv.conf` (grep bắt cả chú thích), dòng 4–5 là cấu hình của server trong
 `nginx/qlsv.conf`. `access_log` khai báo ở mức `server` **thay thế** cái khai báo ở mức `http`,
 nên request vào server này chỉ được ghi theo định dạng `qlsv`.
@@ -304,7 +305,7 @@ Ba trường thêm vào cuối:
 
 | Trường | Ý nghĩa |
 |---|---|
-| `"$upstream_http_x_user"` | Giá trị header `X-User` trong **response của app**. App (middleware `authenticate`) đặt header này bằng tên đăng nhập cho mọi request đã xác thực. Quy tắc tên biến: `$upstream_http_` + tên header viết thường, `-` đổi thành `_`. `-` nghĩa là chưa đăng nhập, file tĩnh, đăng nhập sai hoặc Nginx tự trả lời |
+| `"$upstream_http_x_user"` | Giá trị header `X-User` trong **response của app**. App (middleware `authenticate`) đặt header này bằng tên đăng nhập cho mọi request đã xác thực. Quy tắc tên biến: `$upstream_http_` + tên header viết thường, `-` đổi thành `_`. `-` nghĩa là chưa đăng nhập, file tĩnh, đăng nhập sai hoặc Nginx tự trả lời. Ngoại lệ: vài lỗi app trả về **trước** bước xác thực — body JSON hỏng (400), body JSON vượt 1 MB (413), đường dẫn `/api/...` không tồn tại (404) — cũng ghi `-` dù request có gửi token |
 | `rt=$request_time` | Tổng thời gian xử lý request (giây, chính xác tới mili giây), tính cả thời gian nhận body và gửi response tới client |
 | `urt=$upstream_response_time` | Thời gian chờ app trả lời. `-` khi request **không** được chuyển vào app (ví dụ 413, 400 do Nginx tự trả) |
 
@@ -968,8 +969,9 @@ $ awk '{ for (i = NF; i > 0; i--) if ($i ~ /^rt=/) { print substr($i, 4), $9, $7
 0.315 200 /api/students/export?format=xlsx&q=
 ```
 
-Hai kiểu 413: Nginx chặn (body vượt `client_max_body_size 10m`, request không tới app, `urt=-`,
-không có user) và app chặn (ảnh vượt 5 MB, có user):
+Hai kiểu 413 có trong log mẫu: Nginx chặn (body vượt `client_max_body_size 10m`, request không tới app, `urt=-`,
+không có user) và app chặn (ảnh vượt 5 MB, có user). Kiểu thứ ba không có trong log mẫu: app chặn body JSON
+vượt 1 MB. Lỗi này xảy ra trước bước xác thực nên user là `-`, còn `urt` vẫn có giá trị:
 
 ```console
 $ awk -F'"' '{ split($3, s, " ") } s[1] == 413 { print $2, "|", s[1], s[2], "| user:", $8, "|", $9 }' access.log
@@ -1342,7 +1344,9 @@ $ gzip -dcf access.log* | awk '{ print $1 }' | sort | uniq -c | sort -rn | head 
 
 (`gzip -dcf`: `-d` giải nén, `-c` in ra stdout, `-f` cho phép đọc cả file không nén.) Script
 `log-report.sh` cũng nhận nhiều file, tự giải nén `.gz`:
-`scripts/log-report.sh -f access.log -f access.log.1 -f access.log.2.gz`.
+`scripts/log-report.sh -f access.log -f access.log.1 -f access.log.2.gz`. Thứ tự file không quan
+trọng: dòng "Từ … đến …" lấy mốc sớm nhất và muộn nhất theo thời gian, bảng theo ngày được sắp
+tăng dần.
 
 Lưu ý thêm:
 
@@ -1545,10 +1549,11 @@ $ printf '%b\n' "$(echo 'Tr%E1%BA%A7n' | sed 's/%/\\x/g')"
 Trần
 ```
 
-(Chữ tiếng Việt được mã hóa phần trăm theo UTF-8; lệnh cuối giải mã `Tr%E1%BA%A7n` thành `Trần`.) Ở Việt Nam, Nghị định 13/2023/NĐ-CP coi dữ
-liệu phản ánh hoạt động, lịch sử hoạt động trên không gian mạng là dữ liệu cá nhân, và Luật Bảo
-vệ dữ liệu cá nhân (số 91/2025/QH15, hiệu lực từ 01/01/2026) đặt ra nghĩa vụ bảo vệ dữ liệu
-cá nhân. Ở châu Âu, GDPR cũng coi địa chỉ IP là dữ liệu cá nhân. Trong thực tế:
+(Chữ tiếng Việt được mã hóa phần trăm theo UTF-8; lệnh cuối giải mã `Tr%E1%BA%A7n` thành `Trần`.) Ở Việt Nam, Luật Bảo vệ
+dữ liệu cá nhân (số 91/2025/QH15) và Nghị định 356/2025/NĐ-CP hướng dẫn thi hành luật này (cùng có
+hiệu lực từ 01/01/2026, thay thế Nghị định 13/2023/NĐ-CP trước đây) đặt ra nghĩa vụ bảo vệ dữ liệu
+cá nhân. Log truy cập gắn IP và tên đăng nhập với hoạt động của một người cụ thể, nên phải được bảo
+vệ như dữ liệu cá nhân. Ở châu Âu, GDPR cũng coi địa chỉ IP là dữ liệu cá nhân. Trong thực tế:
 
 - **Chỉ giữ log trong thời gian cần thiết**, và ghi rõ trong chính sách: logrotate `rotate 14`
   nghĩa là giữ 14 ngày; có thể thêm `maxage 30`. Đừng quên xóa cả báo cáo GoAccess cũ.

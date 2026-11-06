@@ -443,8 +443,11 @@ $ curl -s -X DELETE "$API/api/users/1" -H "Authorization: Bearer $ADMIN"; echo
 
 ## 9. Đối chiếu với nhật ký Nginx
 
-Vì mọi response của người đã đăng nhập đều có header `X-User`, Nginx ghi được tên người dùng
-vào cột `"$upstream_http_x_user"` của log (xem `nginx/qlsv.conf` và `docs/NGINX-LOG.md`).
+App gắn header `X-User` vào response của mọi request đã qua bước xác thực (middleware
+`authenticate`), nên Nginx ghi được tên người dùng vào cột `"$upstream_http_x_user"` của log (xem
+`nginx/qlsv.conf` và `docs/NGINX-LOG.md`). Ngoại lệ là các lỗi app trả về trước bước xác thực:
+body JSON hỏng (400), body JSON vượt 1 MB (413), đường dẫn `/api/...` không tồn tại (404). Những
+dòng này ghi user là `-` dù request có token.
 Một số câu hỏi kiểm toán (audit) trả lời được ngay từ log mẫu `nginx/sample-logs/access.log`:
 
 Ai đã bị từ chối quyền (403), lúc nào, với chức năng gì?
